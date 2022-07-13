@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include<vector>
-#include<time.h>
+#include<ctime>
 #include<sstream>
 
 #include<SFML/Graphics.hpp>
@@ -11,6 +11,21 @@
 #include<SFML/Audio.hpp>
 #include<SFML/Window.hpp>
 #include<SFML/Network.hpp>
+
+class Enemy
+{
+public:
+	//object
+	sf::RectangleShape type;
+	
+	//controctor
+	Enemy();
+
+	//methods
+	sf::RectangleShape getType();
+	void setTypeSize(sf::Vector2f size);
+	void setTypeColor(sf::Color color);
+};
 
 class Game
 {
@@ -25,8 +40,8 @@ private:
 	sf::Vector2f viewMousePos;
 		
 	//dynamic objects
-	sf::RectangleShape enemy;
-	std::vector<sf::RectangleShape> enemies;
+	Enemy enemy;
+	std::vector<Enemy> enemies;
 
 	//game logic
 	float spawnTimer;
@@ -40,13 +55,11 @@ private:
 	sf::Font font;
 	sf::Text text;
 
-
 	//private functions
 	void initVariables();
 	void initFont();
 	void initText();
 	void initWindow();
-	void initEnemy();
 
 public:
 	//controctor and destructor
@@ -74,4 +87,3 @@ public:
 };
 
 #endif
-

@@ -9,7 +9,7 @@ void Game::initVariables()
 	this->endGame = false;
 	this->points = 0;
 	this->health = 10;
-	this->spwnTimerMax = 10.f;
+	this->spwnTimerMax = 20.f;
 	this->spawnTimer = this->spwnTimerMax;
 	this->maxEnemies = 5;
 }
@@ -35,13 +35,11 @@ void Game::initWindow()
 }
 
 //game dynamic objects
-void Game::initEnemy()
-{
-	this->enemy.setSize(sf::Vector2f(50.f, 50.f));
-	this->enemy.setPosition(sf::Vector2f(10.f, 10.f));
-	this->enemy.setFillColor(sf::Color::Red);
-	this->enemy.setOutlineColor(sf::Color::Blue);
-}
+//void Game::initEnemy(sf:)
+//{
+//	this->enemy.setSize(sf::Vector2f(50.f, 50.f));
+//	this->enemy.setFillColor(sf::Color::Red);
+//}
 
 //contructor and destructor
 Game::Game()
@@ -50,7 +48,6 @@ Game::Game()
 	this->initWindow();
 	this->initFont();
 	this->initText();
-	this->initEnemy();
 }
 
 Game::~Game()
@@ -86,25 +83,56 @@ void Game::spawnEnemy()
 		-adds enemy to the vector
 	*/
 
-	//color and position
-	this->enemy.setPosition(
-		static_cast<float>(rand() % static_cast<int>(this->renderWindow->getSize().x - this->enemy.getSize().x)),
+	//position
+	this->enemy.type.setPosition(
+		static_cast<float>(rand() % static_cast<int>(this->renderWindow->getSize().x - this->enemy.type.getSize().x)),
 		0.f
 		);
-	this->enemy.setFillColor(sf::Color::Yellow);
+
+
+	//type selector
+	int selector = rand() % 4;
+
+	sf::Vector2f size;
+	sf::Color color;
+	switch (selector)
+	{
+	case 0:
+		size = sf::Vector2f (100.f, 100.f);
+		color = sf::Color::Yellow;
+		break;
+	case 1:
+		size = sf::Vector2f(75.f, 75.f);
+		color = sf::Color::Green;
+		break;
+	case 2:
+		size = sf::Vector2f(50.f, 50.f);
+		color = sf::Color::Blue;
+		break;
+	case 3:
+		size = sf::Vector2f(25.f, 25.f);
+		color = sf::Color::Magenta;
+		break;
+	default:
+		break;
+	}
+
+	//set
+	this->enemy.setTypeSize(size);
+	this->enemy.setTypeColor(color);
 
 	//update vector elements
 	this->enemies.push_back(this->enemy);
-
-	//remove from bottom
-
 }
 
 void Game::poolEvents()
 {
+	/*
+		@return void
+		->close mecanism - close botton , close exit
+	*/
 	while (this->isEvent())
 	{
-		//close mecanism
 		switch (this->event.type)
 		{
 		case sf::Event::Closed:
@@ -122,6 +150,12 @@ void Game::poolEvents()
 
 void Game::updateMousePos()
 {
+	/*
+		@return void 
+			-> mouse window ponsition
+			-> mouse window coordonates;
+	*/
+
 	this->mousePos = sf::Mouse::getPosition(*this->renderWindow);
 	this->viewMousePos = this->renderWindow->mapPixelToCoords(this->mousePos);
 }
@@ -131,11 +165,21 @@ void Game::updateText()
 	std::stringstream displayText;
 	displayText << "Points : " << this->points << "\n" << "Health :" << this->health;
 	this->text.setString(displayText.str());
-
 }
 
 void Game::updateEnemies()
 {
+	/*
+		@return void 
+			-> spawn enemies ;
+			-> move enemies ;
+			-> delete enemies mecanism 
+				{
+					- when is bellow the window ;
+					- when is clicked ;
+				}
+	*/
+
 	//spawn enemies
 	if (this->enemies.size() < this->maxEnemies)
 	{
@@ -154,12 +198,12 @@ void Game::updateEnemies()
 	for (int index = 0; index < this->enemies.size();++index)
 	{
 		bool deleted = false;
-		this->enemies[index].move(0.f, 1.f);
+		this->enemies[index].type.move(0.f, 2.f);
 
 		//check if mouse is clicked
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 		{
-			if (this->enemies[index].getGlobalBounds().contains(this->viewMousePos))
+			if (this->enemies[index].type.getGlobalBounds().contains(this->viewMousePos))
 			{
 				this->points += 5;
 				deleted = true;
@@ -167,7 +211,7 @@ void Game::updateEnemies()
 		}
 
 		//check if enemy is bellow the screen
-		if (this->videoMode.height <= this->enemies[index].getPosition().y)
+		if (this->videoMode.height <= this->enemies[index].type.getPosition().y)
 		{
 			this->health -= 5;
 			deleted = true;
@@ -213,7 +257,7 @@ void Game::renderEnemies()
 {
 	for (auto& e : this->enemies)
 	{
-		this->renderWindow->draw(e);
+		this->renderWindow->draw(e.type);
 	}
 }
 
@@ -223,7 +267,7 @@ void Game::render()
 		return void
 			->clear old frame
 			->draw next one and text
-			->display
+e			->display
 	*/
 
 	this->renderWindow->clear();
@@ -232,5 +276,28 @@ void Game::render()
 	this->renderText();
 
 	this->renderWindow->display();
+}
 
+
+//enemy class
+//contructor & destructor 
+Enemy::Enemy()
+{
+	type.setSize(sf::Vector2f (20.f, 20.f) );
+	type.setFillColor(sf::Color::Yellow);
+}
+
+sf::RectangleShape Enemy::getType()
+{
+	return type;
+}
+
+void Enemy::setTypeSize(sf::Vector2f size)
+{
+	type.setSize(size);
+}
+
+void Enemy::setTypeColor(sf::Color color)
+{
+	type.setFillColor(color);
 }

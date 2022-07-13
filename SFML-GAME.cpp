@@ -18,7 +18,6 @@ int main()
 	//init game
 	Game myGame;
 	
-
 	/*
 		create the GameLoop
 			- mantain the window open
@@ -33,9 +32,7 @@ int main()
 
 		//game render
 		myGame.render();
-
 	}
 
 	return 0;
 }
-
